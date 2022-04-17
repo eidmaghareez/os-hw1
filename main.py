@@ -1,7 +1,7 @@
 import operator
 import sys
 import copy
-#sada
+
 
 #function to call to end the program
 def progdone():
@@ -170,11 +170,15 @@ class pcb:
 
 
 
-algorithm = "RR"
-quantum = 30
-infile = "input.txt"
+
+algorithm = str((sys.argv[1]))
+quantum = int(sys.argv[2])
+infile = str((sys.argv[3]))
 inputfile = open(infile, "r")
 input = inputfile.readlines()
+
+
+
 if algorithm == ("PR"):
     processes = []
     nprocesses = 0
@@ -237,159 +241,150 @@ if algorithm == ("PR"):
     if ((len(readyqueue) == 0) and isprogdone == True):
         progdone()
 
-#print esh il hw bedo
-
-# inputs from system
-# algorithm = str((sys.argv[1]))
-# quantum = int(sys.argv[2])
-# infile = str((sys.argv[3]))
-# print("algo : ",algorithm)
-# print("q: ",quantum)
-# print("inputfile : ",infile)
-# inputfile = open(infile, "r")
-
-# elif algorithm==("RR"):
-
-processes = []
-nprocesses = 0
-readyqueue = []
-arrivetime = 0
-cputime = 0
-id = 0
-avgturnaround = 0
-avgresponsetime = 0
-idletime = 0
-totalbursttime = 0
-cputimeline = []
-cputimelineitime = []
-#loop through the input to get processes/idletime/if the program is done
-for i in range(len(input)):
-    #line the current line in the input we are looping through
-    line = input[i]
-    #function is what the line is telling us to do either create a process or idle or exit and we do it by taking the first 4 characters of the line
-    func = line[:4]
-    #if function is equal to proc then we should create a new process and in this if statement we gather info required to create a process
-    if func == "proc":
-        #increase number of processes by 1
-        nprocesses += 1
-        #get total number of bursts for each process
-        number_of_bursts = line[7]
-        #remove the newline from the line we are working on
-        line = line.strip("\n")
-        #create a list named bursts and we add the bursts to it by seperating each burst when we see a space
-        bursts = line[9:].split(" ")
-        #turn the burst list into integers
-        bursts = list(map(int, bursts))
-        #add the total time that this process will run for (cpu time and i/o time)
-        totalbursttime += sum(bursts)
-        #create a new process and add the number of bursts / burst list / when the process arrived and add priority to 0 because we don't care about that in Round Robin
-        process = createprocess(0, number_of_bursts, bursts, arrivetime)
-        #add the process we created to the processes list
-        processes.append((process))
-        #add the process to the ready queue
-        readyqueue.append(processes[nprocesses - 1])
-    #else if the func is idle
-    elif func == "idle":
-        #take the idle time from the line by stripping it from \n and turning it to an integer
-        idle = int(line[5:].strip(" \n"))
-        #adding the idle time to the total idle time for cpu
-        idletime += idle
-        #adding the idle time to the arrive time which was set to 0 so when a new process arrives its arrive time is set to the new arrivetime value
-        arrivetime += idle
-    else:
-        isprogdone = True
-readyqueue2=[]
-# readyqueue2.extend(readyqueue)
-readyqueue2=copy.deepcopy(readyqueue)
 
 
-#while the readyqueue is not empty
-version = 1
-if version == 1:
-    while (readyqueue):
-        cp = readyqueue[0]
-        if (cp.updatefirstrun == True):
-            
-            cp.firstrun = cputime
-            cp.updatefirstrun = False
-            avgresponsetime += cp.responsetime() / nprocesses
-    
-        temp = cp.totalcpu
-        if (quantum > cp.totalcpu):
-           
-            cp.totalcpu = 0
-        else:
-            
-            cp.totalcpu -= quantum
-
-        cputime += quantum
-        if (cp.totalcpu > 0):
-            readyqueue.append(cp)
-            
-        else:
-            cp.donetime = cputime
-            avgturnaround += (cp.turnaroundtime() / nprocesses)
-        if (len(readyqueue) > 1 and temp < quantum):
-            np = readyqueue[1]
-            if (np.firstrun == True):
-                np.firstrun = cputime - (quantum - temp)
-                np.updatefirstrun == False
-                avgresponsetime += np.responsetime() / nprocesses
-
-            np.totalcpu -= (quantum - temp)
-        readyqueue.pop(0)
-
-
-
-    cpuutilization = totalbursttime / (totalbursttime + idletime)
-    print("\n\nInput file name : ", infile, "\nCpu scheduling algorithm : ",
-          algorithm, "\nCpu utilization : ", cpuutilization,
-          "\nAvg. Turnaround time : ", avgturnaround,
-          "\nAvg. Response time in R queue : ", avgresponsetime,
-          "\nCPU timeline : \n")
-    print("1-All Processes general information")
-    for i in range(len(readyqueue2)):
-     readyqueue2[i].info()
-
+if algorithm ==("RR"):
+    processes = []
+    nprocesses = 0
+    readyqueue = []
+    arrivetime = 0
     cputime = 0
-    print("2-Cpu timeline")
-    while (readyqueue2):
-        #cp -> current process we are running
-        cp = readyqueue2[0]
-        print("\n\ncurrent process running is process No.", cp.pid)
-        #if the process never ran before then set its first run time to the curr cputime
-        if (cp.updatefirstrun == True):
-            print("running for the first time on the cpu at time : ", cputime,
-                  "ms")
-            cp.firstrun = cputime
-            cp.updatefirstrun = False
-            avgresponsetime += cp.responsetime() / nprocesses
-        #decrease the total time the process should run on the cpu by the timeslice(quantum)
-        print("total cpu time is : ", cp.totalcpu, "ms")
-        temp = cp.totalcpu
-        if (quantum > cp.totalcpu):
-            print("it ran for ", quantum - temp, "ms this time slice")
-            cp.totalcpu = 0
+    id = 0
+    avgturnaround = 0
+    avgresponsetime = 0
+    idletime = 0
+    totalbursttime = 0
+    cputimeline = []
+    cputimelineitime = []
+    #loop through the input to get processes/idletime/if the program is done
+    for i in range(len(input)):
+        #line the current line in the input we are looping through
+        line = input[i]
+        #function is what the line is telling us to do either create a process or idle or exit and we do it by taking the first 4 characters of the line
+        func = line[:4]
+        #if function is equal to proc then we should create a new process and in this if statement we gather info required to create a process
+        if func == "proc":
+            #increase number of processes by 1
+            nprocesses += 1
+            #get total number of bursts for each process
+            number_of_bursts = line[7]
+            #remove the newline from the line we are working on
+            line = line.strip("\n")
+            #create a list named bursts and we add the bursts to it by seperating each burst when we see a space
+            bursts = line[9:].split(" ")
+            #turn the burst list into integers
+            bursts = list(map(int, bursts))
+            #add the total time that this process will run for (cpu time and i/o time)
+            totalbursttime += sum(bursts)
+            #create a new process and add the number of bursts / burst list / when the process arrived and add priority to 0 because we don't care about that in Round Robin
+            process = createprocess(0, number_of_bursts, bursts, arrivetime)
+            #add the process we created to the processes list
+            processes.append((process))
+            #add the process to the ready queue
+            readyqueue.append(processes[nprocesses - 1])
+        #else if the func is idle
+        elif func == "idle":
+            #take the idle time from the line by stripping it from \n and turning it to an integer
+            idle = int(line[5:].strip(" \n"))
+            #adding the idle time to the total idle time for cpu
+            idletime += idle
+            #adding the idle time to the arrive time which was set to 0 so when a new process arrives its arrive time is set to the new arrivetime value
+            arrivetime += idle
         else:
-            print("it ran for ", quantum, "ms this time slice")
-            cp.totalcpu -= quantum
-
-        cputime += quantum
-        if (cp.totalcpu > 0):
-            readyqueue2.append(cp)
-            print("remaining time for this process is ", cp.totalcpu, "ms")
-        else:
-            print("process No.", cp.pid, "IS DONE at time : ", cputime, "ms")
-            cp.donetime = cputime
-            avgturnaround += (cp.turnaroundtime() / nprocesses)
-        if (len(readyqueue2) > 1 and temp < quantum):
-            np = readyqueue2[1]
-            print("In the same")
-            if (np.firstrun == True):
-                np.firstrun = cputime - (quantum - temp)
-                np.updatefirstrun == False
-                avgresponsetime += np.responsetime() / nprocesses
-
-            np.totalcpu -= (quantum - temp)
-        readyqueue2.pop(0)
-
+            isprogdone = True
+    readyqueue2=[]
+    # readyqueue2.extend(readyqueue)
+    readyqueue2=copy.deepcopy(readyqueue)
+    
+    
+    #while the readyqueue is not empty
+    version = 1
+    if version == 1:
+        while (readyqueue):
+            cp = readyqueue[0]
+            if (cp.updatefirstrun == True):
+                
+                cp.firstrun = cputime
+                cp.updatefirstrun = False
+                avgresponsetime += cp.responsetime() / nprocesses
+        
+            temp = cp.totalcpu
+            if (quantum > cp.totalcpu):
+               
+                cp.totalcpu = 0
+            else:
+                
+                cp.totalcpu -= quantum
+    
+            cputime += quantum
+            if (cp.totalcpu > 0):
+                readyqueue.append(cp)
+                
+            else:
+                cp.donetime = cputime
+                avgturnaround += (cp.turnaroundtime() / nprocesses)
+            if (len(readyqueue) > 1 and temp < quantum):
+                np = readyqueue[1]
+                if (np.firstrun == True):
+                    np.firstrun = cputime - (quantum - temp)
+                    np.updatefirstrun == False
+                    avgresponsetime += np.responsetime() / nprocesses
+    
+                np.totalcpu -= (quantum - temp)
+            readyqueue.pop(0)
+    
+    
+    
+        cpuutilization = totalbursttime / (totalbursttime + idletime)
+        print("\n\nInput file name : ", infile, "\nCpu scheduling algorithm : ",
+              algorithm, "\nCpu utilization : ", cpuutilization,
+              "\nAvg. Turnaround time : ", avgturnaround,
+              "\nAvg. Response time in R queue : ", avgresponsetime,
+              "\nCPU timeline : \n")
+        print("1-All Processes general information")
+        for i in range(len(readyqueue2)):
+         readyqueue2[i].info()
+    
+        cputime = 0
+        print("2-Cpu timeline")
+        while (readyqueue2):
+            #cp -> current process we are running
+            cp = readyqueue2[0]
+            print("\n\ncurrent process running is process No.", cp.pid)
+            #if the process never ran before then set its first run time to the curr cputime
+            if (cp.updatefirstrun == True):
+                print("running for the first time on the cpu at time : ", cputime,
+                      "ms")
+                cp.firstrun = cputime
+                cp.updatefirstrun = False
+                avgresponsetime += cp.responsetime() / nprocesses
+            #decrease the total time the process should run on the cpu by the timeslice(quantum)
+            print("total cpu time is : ", cp.totalcpu, "ms")
+            temp = cp.totalcpu
+            if (quantum > cp.totalcpu):
+                print("it ran for ", quantum - temp, "ms this time slice")
+                cp.totalcpu = 0
+            else:
+                print("it ran for ", quantum, "ms this time slice")
+                cp.totalcpu -= quantum
+    
+            cputime += quantum
+            if (cp.totalcpu > 0):
+                readyqueue2.append(cp)
+                print("remaining time for this process is ", cp.totalcpu, "ms")
+            else:
+                print("process No.", cp.pid, "IS DONE at time : ", cputime, "ms")
+                cp.donetime = cputime
+                avgturnaround += (cp.turnaroundtime() / nprocesses)
+            if (len(readyqueue2) > 1 and temp < quantum):
+                np = readyqueue2[1]
+                print("In the same")
+                if (np.firstrun == True):
+                    np.firstrun = cputime - (quantum - temp)
+                    np.updatefirstrun == False
+                    avgresponsetime += np.responsetime() / nprocesses
+    
+                np.totalcpu -= (quantum - temp)
+            readyqueue2.pop(0)
+    if ((len(readyqueue) == 0) and isprogdone == True):
+        progdone()
